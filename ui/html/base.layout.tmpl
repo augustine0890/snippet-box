@@ -4,6 +4,10 @@
   <head>
     <meta charset='utf-8'>
     <title>{{template "title" .}} - Snippetbox</title>
+    <link rel='stylesheet' type='text/css' href='/static/css/main.css'>
+    <link rel='stylesheet' type='image/x-icon' href='/static/img/favicon.ico'>
+    <!-- Link to fonts hosted by Goole -->
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700'>
   </head>
   <body>
       <header>
@@ -14,9 +18,11 @@
       </nav>
     <main>
       {{template "main" .}}
+    </main>
+    
       <!-- Invoke the footer template -->
       {{template "footer" .}}
-    </main>
+      <script src="/static/js/main.js" type="text/javascript"></script>
   </body>
 </html>
 {{end}}
