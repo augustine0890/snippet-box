@@ -24,6 +24,24 @@
 - `go run ./cmd/web`
 - Using the `-addr` flag
   - `go run ./cmd/web -addr=":3000"`
+- Automated help
+  - `go run ./cmd/web -help`
+
+- Pre-Existing Variables
+  ```go
+  type Config struct {
+    Addr      string
+    StaticDir string
+  }
+
+  cfg := new(Config)
+  flag.StringVar(&cfg.Addr, "addr", ":4000", "HTTP network  address")
+  flag.StringVar(&cfg.StaticDir, "static-dir", "./ui/static", "Path to static assets")
+  flag.Parse()
+  ```
+
+- All incoming HTTP requests are served in their own goroutine.
+- Race conditions are accessing the shared resources from your handlers.
 
 ## Database
 ### Working with Transactions
