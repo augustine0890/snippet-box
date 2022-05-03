@@ -1,5 +1,8 @@
 # Docker DB
 db
 
+# Temporary files
+tmp
+
 # Environment
 .env
