@@ -58,6 +58,11 @@
 - The `sql.Open()` function returns a `sql.DB`object. It's a pool of many connections.
 - The connection pool is safe for concurrent accesss.
 - Should NOT call `sql.Open()` in a short-lived handler.
+### SQL Statements
+- Three different methods for executing database queries:
+  - `DB.Query()` is used for `SELECT` queries which return multiple rows
+  - `DB.QueryRow()` is used for `SELECT` queries which return a single row
+  - `DB.Exec()` is used for statements which don't return rows (like `INSERT` `DELETE`)
 ### Working with Transactions
 - Transactions are also super-useful if you want to execute multiple transactions at single atomic action.
 - `tx.Rollback()` method in the event of any errors, the transaction ensures that either:
