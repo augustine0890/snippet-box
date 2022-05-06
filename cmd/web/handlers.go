@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"snippetbox/pkg/models"
 	"strconv"
-	"text/template"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -14,22 +13,32 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	// Initialize a slice containing the paths
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
 
-	ts, err := template.ParseFiles(files...)
+	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	err = ts.Execute(w, nil)
-	if err != nil {
-		app.serverError(w, err)
+
+	for _, snippet := range s {
+		fmt.Fprintf(w, "%v\n", snippet)
 	}
+	// Initialize a slice containing the paths
+	// files := []string{
+	// "./ui/html/home.page.tmpl",
+	// "./ui/html/base.layout.tmpl",
+	// "./ui/html/footer.partial.tmpl",
+	// }
+
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil {
+	// app.serverError(w, err)
+	// return
+	// }
+	// err = ts.Execute(w, nil)
+	// if err != nil {
+	// app.serverError(w, err)
+	// }
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
