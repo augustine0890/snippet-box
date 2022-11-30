@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"snippetbox/pkg/models"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -14,42 +16,63 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s, err := app.snippets.Latest()
+	snippets, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	for _, snippet := range s {
-		fmt.Fprintf(w, "%v\n", snippet)
-	}
-	// Initialize a slice containing the paths
+	// Initialise a slice containing the paths to 2 files. The ORDER MATTERS
+	// The base template must be first
 	// files := []string{
-	// "./ui/html/home.page.tmpl",
-	// "./ui/html/base.layout.tmpl",
-	// "./ui/html/footer.partial.tmpl",
+	// 	"./ui/html/base.tmpl.html",
+	// 	"./ui/html/partials/nav.tmpl.html",
+	// 	"./ui/html/pages/home.tmpl.html",
 	// }
-
+	// // Use the template.ParseFiles function to read the template file into a
+	// // template set.
 	// ts, err := template.ParseFiles(files...)
 	// if err != nil {
-	// app.serverError(w, err)
-	// return
+	// 	app.errorLog.Print(err.Error())
+	// 	app.serverError(w, err)
+	// 	return
 	// }
-	// err = ts.Execute(w, nil)
+	//
+	// data := &templateData{
+	// 	Snippets: snippets,
+	// }
+
+	// we then execute the methong on the template.
+	// the last param to Execute() is the dynamic data
+	// err = ts.ExecuteTemplate(w, "base", data)
 	// if err != nil {
-	// app.serverError(w, err)
+	// 	app.errorLog.Print(err.Error())
+	// 	app.serverError(w, err)
 	// }
+
+	// Call the newTemplateDate() helper to get a templateDate struct
+	data := app.newTemplateData(r)
+	data.Snippets = snippets
+
+	// Use the new render helper
+	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
 
-func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+// snippetView handler
+func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+	// Extract the value of the id
+	// convert it to an interger using `strconv.Atoi`, if it cant convert it
+	// or its less that 1 return 404
+	id, err := strconv.Atoi(params.ByName("id"))
 	if err != nil || id < 1 {
 		app.notFound(w)
 		return
 	}
 
-	s, err := app.snippets.Get(id)
+	snippet, err := app.snippets.Get(id)
 	if err != nil {
+		// Current best practice for checking for specific error types
 		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
 		} else {
@@ -58,7 +81,10 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, "%v", s)
+	data := app.newTemplateData(r)
+	data.Snippet = snippet
+
+	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {

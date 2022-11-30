@@ -1,0 +1,25 @@
+{{define "title"}}Home{{end}} {{define "main"}}
+<h2>Latest Snippets</h2>
+{{if .Snippets}}
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Created</th>
+      <th>Expires</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .Snippets}}
+    <tr>
+      <td><a href="/snippet/view/{{.ID}}">#{{.ID}}</a></td>
+      <td>{{.Title}}</td>
+      <td>{{.Created | humanDate}}</td>
+      <td>{{.Expires | humanDate}}</td>
+    </tr>
+    {{end}}
+  </tbody>
+  {{end}}
+</table>
+{{end}}
